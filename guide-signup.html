@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Become a Guide</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: #faf8f3;
+      color: #2a2a2a;
+    }
+
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e5e5;
+      background: rgba(250, 248, 243, 0.9);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #3a6ea5;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e5e5e5;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 18px;
+    }
+
+    textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #3a6ea5;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #345f8f;
+    }
+
+    footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 40px;
+    }
+  </style>
+
+  <!-- CORRECT FIREBASE v8 SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+
+<body>
+
+  <a href="index.html" class="logo" style="text-decoration:none; color:inherit; padding:16px 24px; display:flex;">
+    <div class="logo-icon">M</div>
+    Malta Experiences
+  </a>
+
+  <div class="container">
+    <h1>Become a Guide</h1>
+    <p>Share your passion with visitors. Create your own experience and earn money on your schedule.</p>
+
+    <form>
+      <label>Your Name</label>
+      <input type="text" placeholder="John Borg" />
+
+      <label>Short Bio</label>
+      <textarea placeholder="Tell us a little about yourself..."></textarea>
+
+      <label>Experience Title</label>
+      <input type="text" placeholder="Valletta Hidden Gems Walking Tour" />
+
+      <label>Description</label>
+      <textarea placeholder="Describe what guests will do, see, and learn..."></textarea>
+
+      <label>Price (€)</label>
+      <input type="number" placeholder="35" />
+
+      <label>Duration</label>
+      <input type="text" placeholder="e.g. 2 hours, 45 minutes, Half day, Flexible" />
+
+      <label>Upload Images</label>
+      <input id="imageUpload" type="file" accept="image/*" multiple />
+
+      <div id="previewContainer" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
+
+      <button type="submit">Submit Experience</button>
+    </form>
+  </div>
+
+  <footer>
+    © 2026 Malta Experiences — All rights reserved
+  </footer>
+
+<script>
+  // IMAGE PREVIEW
+  const imageUpload = document.getElementById("imageUpload");
+  const previewContainer = document.getElementById("previewContainer");
+
+  imageUpload.addEventListener("change", function () {
+    previewContainer.innerHTML = "";
+    const files = Array.from(this.files);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.width = "100px";
+        img.style.height = "100px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "12px";
+        img.style.border = "1px solid #e5e5e5";
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+</script>
+
+<script>
+  // FIREBASE INIT
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_SFYldGcxy3ULvw9lbxqi65prgbJONJs",
+    authDomain: "malta-d82f0.firebaseapp.com",
+    projectId: "malta-d82f0",
+    storageBucket: "malta-d82f0.appspot.com",
+    messagingSenderId: "632255512218",
+    appId: "1:632255512218:web:e546bb6c7e97486f6e2923",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+</script>
+
+<script>
+  // FORM SUBMISSION
+  const form = document.querySelector("form");
+  const imageInput = document.getElementById("imageUpload");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = form.querySelector('input[placeholder="John Borg"]').value;
+    const bio = form.querySelector('textarea[placeholder="Tell us a little about yourself..."]').value;
+    const title = form.querySelector('input[placeholder="Valletta Hidden Gems Walking Tour"]').value;
+    const description = form.querySelector('textarea[placeholder="Describe what guests will do, see, and learn..."]').value;
+    const price = form.querySelector('input[placeholder="35"]').value;
+    const duration = form.querySelector('input[placeholder="e.g. 2 hours, 45 minutes, Half day, Flexible"]').value;
+
+    const files = Array.from(imageInput.files);
+    const imageUrls = [];
+
+    for (const file of files) {
+      const storageRef = storage.ref("guide_images/" + Date.now() + "_" + file.name);
+      await storageRef.put(file);
+      const url = await storageRef.getDownloadURL();
+      imageUrls.push(url);
+    }
+
+    await db.collection("experiences").add({
+      name,
+      bio,
+      title,
+      description,
+      price,
+      duration,
+      images: imageUrls,
+      createdAt: new Date()
+    });
+
+    alert("Experience submitted successfully!");
+    window.location.href = "index.html";
+  });
+</script>
+
+</body>
+</html>
